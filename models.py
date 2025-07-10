@@ -1,12 +1,15 @@
 from config import db
 from datetime import datetime
+import bcrypt
 
 class Learner(db.Model):
     __tablename__ = 'learners'
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    gender = db.Column(db.String(10), nullable=False)  #Male/Female
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)
+    gender = db.Column(db.String(10), nullable=False)  # Male/Female
     age = db.Column(db.Integer, nullable=False)  #4-11 years
     emergency_contact = db.Column(db.String(15), nullable=False)
     current_grade = db.Column(db.Integer, nullable=False, default=0)  #0-5
@@ -17,6 +20,18 @@ class Learner(db.Model):
     def __repr__(self):
         return f'<Learner {self.name}, Grade {self.current_grade}>'
     
+    def set_password(self, password):
+        """Hash and set the password"""
+        password_bytes = password.encode('utf-8')
+        salt = bcrypt.gensalt()
+        self.password_hash = bcrypt.hashpw(password_bytes, salt).decode('utf-8')
+    
+    def check_password(self, password):
+        """Check if the provided password matches the hash"""
+        password_bytes = password.encode('utf-8')
+        hash_bytes = self.password_hash.encode('utf-8')
+        return bcrypt.checkpw(password_bytes, hash_bytes)
+    
     def can_book_grade(self, lesson_grade):
         """Check if learner can book a lesson of given grade"""
         return lesson_grade == self.current_grade or lesson_grade == self.current_grade + 1
@@ -26,13 +41,26 @@ class Coach(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)
     phone = db.Column(db.String(15))
     
     lessons = db.relationship('Lesson', backref='coach', lazy=True)
     
     def __repr__(self):
         return f'<Coach {self.name}>'
+    
+    def set_password(self, password):
+        """Hash and set the password"""
+        password_bytes = password.encode('utf-8')
+        salt = bcrypt.gensalt()
+        self.password_hash = bcrypt.hashpw(password_bytes, salt).decode('utf-8')
+    
+    def check_password(self, password):
+        """Check if the provided password matches the hash"""
+        password_bytes = password.encode('utf-8')
+        hash_bytes = self.password_hash.encode('utf-8')
+        return bcrypt.checkpw(password_bytes, hash_bytes)
     
     def get_average_rating(self):
         """Calculate average rating for this coach"""
