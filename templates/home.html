@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="hero">
+  <h1>HJSS Management System</h1>
+  <p>Schedule lessons, manage bookings, and track progress with a simple, clean interface.</p>
+  {% if not current_user %}
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="/register/learner">Get started as Learner</a>
+      <a class="btn" href="/login">Login</a>
+    </div>
+  {% endif %}
+</div>
+
+<section class="container" aria-label="features">
+  <div class="flex between" style="gap:1rem; flex-wrap:wrap;">
+    <div class="card" style="flex:1 1 280px;">
+      <h3>Coaches</h3>
+      <p>View coaches, ratings, and availability. Keep your profile up to date.</p>
+      <p><a class="btn" href="/coaches">Browse coaches</a></p>
+    </div>
+    <div class="card" style="flex:1 1 280px;">
+      <h3>Calendar</h3>
+      <p>Find classes by date, coach, or grade. Book instantly if space is available.</p>
+      <p><a class="btn" href="/calendar">Open calendar</a></p>
+    </div>
+    <div class="card" style="flex:1 1 280px;">
+      <h3>My Classes</h3>
+      <p>See upcoming and past sessions, leave reviews, and view attendance.</p>
+      <p><a class="btn" href="/my-classes">Go to my classes</a></p>
+    </div>
+  </div>
+</section>
+{% endblock %}

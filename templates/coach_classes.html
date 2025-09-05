@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}My Classes (Coach){% endblock %}
+{% block content %}
+<h1>My Classes (Coach)</h1>
+<h2>Upcoming</h2>
+<table border="1" cellpadding="6" cellspacing="0" style="width:100%; border-collapse:collapse;">
+  <thead><tr><th>Date</th><th>Time</th><th>Grade</th><th>Bookings</th><th></th></tr></thead>
+  <tbody>
+    {% for l in lessons %}
+      {% set active = l.bookings | selectattr('booking_status', 'equalto', 'booked') | list %}
+      <tr>
+        <td>{{ l.lesson_date }}</td>
+        <td>{{ l.time_slot }}</td>
+        <td>{{ l.grade_level }}</td>
+        <td>{{ active|length }} &nbsp; <a href="{{ url_for('portal.lesson_roster', lesson_id=l.id) }}">Roster</a></td>
+        <td><a href="{{ url_for('portal.attendance', lesson_id=l.id) }}">Take attendance</a></td>
+      </tr>
+    {% endfor %}
+    {% if not lessons %}
+      <tr><td colspan="5">No upcoming classes.</td></tr>
+    {% endif %}
+  </tbody>
+    </table>
+<h2 style="margin-top:1rem;">Past</h2>
+<table border="1" cellpadding="6" cellspacing="0" style="width:100%; border-collapse:collapse;">
+  <thead><tr><th>Date</th><th>Time</th><th>Grade</th><th>Bookings</th></tr></thead>
+  <tbody>
+    {% for l in past_lessons %}
+      {% set active = l.bookings | selectattr('booking_status', 'equalto', 'booked') | list %}
+      <tr>
+        <td>{{ l.lesson_date }}</td>
+        <td>{{ l.time_slot }}</td>
+        <td>{{ l.grade_level }}</td>
+        <td>{{ active|length }}</td>
+      </tr>
+    {% endfor %}
+    {% if not past_lessons %}
+      <tr><td colspan="4">No past classes.</td></tr>
+    {% endif %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Coach Profile{% endblock %}
+{% block content %}
+<h1>My Coach Profile</h1>
+
+<section class="card" style="margin-bottom:1rem;">
+  <h2 style="margin-top:0;text-align:left;">Your details</h2>
+  <dl class="kv">
+    <dt>Name</dt>
+    <dd>{{ (coach.title ~ ' ') if coach.title else '' }}{{ coach.first_name }} {{ coach.last_name }}</dd>
+    <dt>Email</dt>
+    <dd>{{ coach.email }}</dd>
+    {% if coach.phone %}
+      <dt>Phone</dt>
+      <dd>{{ coach.phone }}</dd>
+    {% endif %}
+  </dl>
+</section>
+
+<section class="card">
+  <h2 style="margin-top:0;text-align:left;">Edit profile</h2>
+  <form method="post" enctype="multipart/form-data">
+    <label>Profile image
+      <input type="file" name="profile_image" accept="image/*"/>
+    </label>
+    {% if coach.profile_image %}
+      <div class="center" style="margin:.25rem 0 .5rem;">
+        <img src="{{ url_for('static', filename=coach.profile_image) }}" alt="current image" class="coach-avatar" style="width:120px;height:120px;">
+      </div>
+    {% endif %}
+    <label>About me
+      <textarea name="about_me" rows="5">{{ coach.about_me or '' }}</textarea>
+    </label>
+    <div class="table-actions center" style="margin-top:.5rem;">
+      <button class="btn btn-primary" type="submit">Save</button>
+      <a class="btn" href="{{ url_for('portal.coaches_list') }}">Back to Coaches</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

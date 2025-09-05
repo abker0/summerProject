@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Attendance{% endblock %}
+{% block content %}
+<h1>Attendance: {{ lesson.lesson_date }} {{ lesson.time_slot }} (G{{ lesson.grade_level }})</h1>
+<form method="post">
+  <table border="1" cellpadding="6" cellspacing="0" style="width:100%; border-collapse:collapse;">
+    <thead><tr><th>Learner</th><th>Present</th></tr></thead>
+    <tbody>
+      {% for b in lesson.bookings if b.booking_status == 'booked' %}
+        <tr>
+          <td>{{ b.learner.first_name }} {{ b.learner.last_name }}</td>
+          <td><input type="checkbox" name="present_{{ b.id }}" {% if b.attended %}checked{% endif %}></td>
+        </tr>
+      {% endfor %}
+      {% set active = lesson.bookings | selectattr('booking_status', 'equalto', 'booked') | list %}
+      {% if active|length == 0 %}
+        <tr><td colspan="2">No bookings yet.</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+  <button type="submit">Save attendance</button>
+  <a href="{{ url_for('portal.my_classes') }}">Back</a>
+</form>
+{% endblock %}

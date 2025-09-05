@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+  <h1>Login</h1>
+  <form method="post">
+      <label>Role:
+        <select name="role">
+          <option value="learner">Learner</option>
+          <option value="coach">Coach</option>
+        </select>
+      </label><br/>
+      <label>Email: <input name="email" type="email" required></label><br/>
+      <label>Password: <input name="password" type="password" required></label><br/>
+  <div class="check-row">
+    <label><input type="checkbox" name="remember_me"> Remember me (keep me signed in)</label>
+  </div>
+  <button class="btn btn-primary btn-lg" type="submit">Login</button>
+  </form>
+  <div class="center" style="margin-top:.5rem;">
+    <a class="btn" href="/forgot-password">Forgot password</a>
+  </div>
+{% endblock %}

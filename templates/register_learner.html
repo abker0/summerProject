@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Register Learner{% endblock %}
+{% block content %}
+  <h1>Register Learner</h1>
+  <form method="post">
+      <label>First name: <input name="first_name" required></label><br/>
+      <label>Last name: <input name="last_name" required></label><br/>
+      <label>Email: <input name="email" type="email" required></label><br/>
+      <label>Password: <input name="password" type="password" required></label><br/>
+      <label>Confirm: <input name="confirm" type="password" required></label><br/>
+
+      <label>Gender:
+        <select name="gender" required>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+          <option value="Rather not say">Rather not say</option>
+        </select>
+      </label>
+      <label>Age: <input name="age" type="number" min="4" max="11" required></label>
+      <label>Emergency contact: <input name="emergency_contact" required></label>
+      <label>Current grade: <input name="current_grade" type="number" min="0" max="5" value="0" required></label>
+
+    <button class="btn btn-primary btn-lg" type="submit">Create learner account</button>
+  </form>
+  <div class="center" style="margin-top:.5rem;">
+    <a class="btn" href="/register/coach">Coach register</a>
+  </div>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block title %}Calendar{% endblock %}
+{% block content %}
+<h1>Calendar</h1>
+
+<form id="filters" class="card" method="get">
+  <label>Coach
+    <select name="coach_id">
+      <option value="">All</option>
+      {% for c in coaches %}
+        <option value="{{ c.id }}" {% if selected_coach and selected_coach == c.id %}selected{% endif %}>{{ c.first_name }} {{ c.last_name }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Grade
+    <select name="grade">
+      <option value="">All</option>
+      {% for g in range(1,6) %}
+        <option value="{{ g }}" {% if selected_grade and selected_grade == g %}selected{% endif %}>{{ g }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Date
+    <input id="date-input" class="date-lg" type="text" name="date" value="{{ selected_date or '' }}" readonly placeholder="YYYY-MM-DD"/>
+  </label>
+  <div class="table-actions" style="text-align:center; margin-top:.5rem;">
+    <a class="btn" href="{{ url_for('portal.calendar_view') }}">Reset</a>
+    <a class="btn" href="{{ url_for('portal.my_classes') }}">My classes</a>
+    <a class="btn" href="{{ url_for('portal.coaches_list') }}">Coaches</a>
+    {% if role == 'coach' %}<a class="btn" href="{{ url_for('portal.coach_profile') }}">Edit coach profile</a>{% endif %}
+  </div>
+  <p class="center muted" style="margin:.5rem 0 0;">Filters auto-apply when changed.</p>
+  </form>
+
+<script>
+  // Auto-submit filters on change for a smoother UX
+  (function(){
+    const form = document.getElementById('filters');
+    if (!form) return;
+    const inputs = form.querySelectorAll('select');
+    inputs.forEach(el => el.addEventListener('change', () => form.submit()));
+  })();
+  (function(){
+    const form = document.getElementById('filters');
+    const input = document.getElementById('date-input');
+    if (!form || !input) return;
+
+    let current = input.value ? new Date(input.value) : new Date();
+    if (isNaN(current.getTime())) current = new Date();
+
+    function fmt(d){
+      const m = (d.getMonth()+1).toString().padStart(2,'0');
+      const day = d.getDate().toString().padStart(2,'0');
+      return `${d.getFullYear()}-${m}-${day}`;
+    }
+
+    function build(){
+      const backdrop = document.createElement('div');
+      backdrop.className = 'dp-backdrop';
+      const panel = document.createElement('div');
+      panel.className = 'dp-panel card';
+
+      const header = document.createElement('div');
+      header.className = 'dp-header';
+      const prev = document.createElement('button'); prev.type='button'; prev.className='btn'; prev.textContent='‹';
+      const title = document.createElement('div'); title.className='dp-title';
+      const next = document.createElement('button'); next.type='button'; next.className='btn'; next.textContent='›';
+      header.append(prev,title,next);
+
+      const grid = document.createElement('div'); grid.className='dp-grid';
+
+      function render(){
+        // Title
+        const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        title.textContent = `${monthNames[current.getMonth()]} ${current.getFullYear()}`;
+        // Grid
+        grid.innerHTML = '';
+        const dow = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        for (const d of dow){
+          const el = document.createElement('div'); el.className='dp-dow'; el.textContent=d; grid.appendChild(el);
+        }
+        const first = new Date(current.getFullYear(), current.getMonth(), 1);
+        const startIdx = first.getDay();
+        const daysInMonth = new Date(current.getFullYear(), current.getMonth()+1, 0).getDate();
+        for (let i=0;i<startIdx;i++){
+          const pad = document.createElement('div'); pad.className='dp-pad'; grid.appendChild(pad);
+        }
+        for (let day=1; day<=daysInMonth; day++){
+          const btn = document.createElement('button');
+          btn.type='button'; btn.className='dp-day'; btn.textContent=day;
+          btn.addEventListener('click', ()=>{
+            const picked = new Date(current.getFullYear(), current.getMonth(), day);
+            input.value = fmt(picked);
+            document.body.removeChild(backdrop);
+            form.submit();
+          });
+          grid.appendChild(btn);
+        }
+      }
+
+      prev.addEventListener('click', ()=>{ current = new Date(current.getFullYear(), current.getMonth()-1, 1); render(); });
+      next.addEventListener('click', ()=>{ current = new Date(current.getFullYear(), current.getMonth()+1, 1); render(); });
+
+      panel.append(header, grid);
+      backdrop.appendChild(panel);
+      backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop){ document.body.removeChild(backdrop);} });
+      document.body.appendChild(backdrop);
+      render();
+    }
+
+    input.addEventListener('click', build);
+  })();
+  </script>
+
+<table style="margin-top:1rem;">
+  <thead>
+    <tr>
+      <th>Date</th><th>Day</th><th>Time</th><th>Grade</th><th>Coach</th><th>Spaces</th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for l in lessons %}
+      <tr class="{% if l.is_full() %}full{% endif %}">
+        <td>{{ l.lesson_date }}</td>
+        <td>{{ l.day_of_week }}</td>
+        <td>{{ l.time_slot }}</td>
+        <td>{{ l.grade_level }}</td>
+        <td>{{ l.coach.first_name }} {{ l.coach.last_name }}</td>
+        <td>
+          {% set spaces = l.get_available_spaces() %}
+          {% if spaces <= 0 %}
+            <span class="badge danger">Full</span>
+          {% else %}
+            <span class="badge">{{ spaces }} left</span>
+          {% endif %}
+        </td>
+        <td>
+          <form action="{{ url_for('portal.book_lesson', lesson_id=l.id) }}" method="post" style="margin:0;">
+            <input type="hidden" name="next" value="{{ request.full_path }}">
+            <button class="btn btn-primary" type="submit" {% if l.is_full() %}disabled{% endif %}>Book</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    {% if not lessons %}
+      <tr><td colspan="7">No lessons match your filters.</td></tr>
+    {% endif %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Find Learners{% endblock %}
+{% block content %}
+<h1>Learners</h1>
+
+<form class="card" method="get">
+  <div class="center">
+    <input class="search-input" type="text" name="q" placeholder="Search by name or email" value="{{ q }}" aria-label="Search"/>
+  </div>
+  <div class="table-actions" style="text-align:center; margin-top:.5rem;">
+    <button class="btn btn-primary" type="submit">Search</button>
+  </div>
+  {% if q and not results %}
+    <p class="center muted" style="margin:.5rem 0 0;">No learners found.</p>
+  {% endif %}
+  {% if not q %}
+    <p class="center muted" style="margin:.5rem 0 0;">Enter a name or email to search.</p>
+  {% endif %}
+</form>
+
+{% if results %}
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Email</th><th>Grade</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for l in results %}
+        <tr>
+          <td>{{ l.first_name }} {{ l.last_name }}</td>
+          <td>{{ l.email }}</td>
+          <td>{{ l.current_grade }}</td>
+          <td class="table-actions">
+            <a class="btn" href="{{ url_for('portal.learner_profile', learner_id=l.id) }}">View</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+{% endblock %}

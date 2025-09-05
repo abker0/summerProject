@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Roster{% endblock %}
+{% block content %}
+<h1>Roster: {{ lesson.lesson_date }} {{ lesson.time_slot }} (G{{ lesson.grade_level }})</h1>
+<table border="1" cellpadding="6" cellspacing="0" style="width:100%; border-collapse:collapse;">
+  <thead><tr><th>Name</th><th>Grade</th><th>Emergency contact</th><th>Booked at</th></tr></thead>
+  <tbody>
+    {% for b in bookings %}
+      <tr>
+        <td>{{ b.learner.first_name }} {{ b.learner.last_name }}</td>
+        <td>{{ b.learner.current_grade }}</td>
+        <td>{{ b.learner.emergency_contact }}</td>
+        <td>{{ b.booking_date }}</td>
+      </tr>
+    {% endfor %}
+    {% if not bookings %}
+      <tr><td colspan="4">No bookings.</td></tr>
+    {% endif %}
+  </tbody>
+</table>
+<p><a href="{{ url_for('portal.my_classes') }}">Back to My Classes</a></p>
+{% endblock %}

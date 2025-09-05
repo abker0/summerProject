@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Review{% endblock %}
+{% block content %}
+<h1>Review</h1>
+<p>Class: {{ booking.lesson.lesson_date }} {{ booking.lesson.time_slot }} with {{ booking.lesson.coach.first_name }} {{ booking.lesson.coach.last_name }}</p>
+<form method="post">
+  <label>Rating (1-5)
+    <select name="rating">
+      {% for n in range(1,6) %}
+        <option value="{{ n }}" {% if booking.review and booking.review.rating == n %}selected{% endif %}>{{ n }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Comment
+    <textarea name="comment" rows="4" style="width:100%;">{{ booking.review.comment if booking.review else '' }}</textarea>
+  </label>
+  <button type="submit">Submit</button>
+  <a href="{{ url_for('portal.my_classes') }}">Back</a>
+</form>
+{% endblock %}

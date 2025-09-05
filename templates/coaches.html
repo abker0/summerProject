@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Coaches{% endblock %}
+{% block content %}
+<h1>Coaches</h1>
+<div class="grid">
+  {% for coach, avg, count in summary %}
+    <div class="card coach-card">
+      <div class="coach-card__head">
+        <img class="coach-avatar" src="{{ url_for('static', filename=coach.profile_image) if coach.profile_image else url_for('static', filename='placeholder.svg') }}" alt="{{ coach.first_name }}">
+        <div>
+          <div class="coach-name">{{ coach.title }} {{ coach.first_name }} {{ coach.last_name }}</div>
+          <div class="coach-meta">Rating: {{ '%.1f' % avg }} ({{ count }} reviews)</div>
+        </div>
+      </div>
+      {% if coach.about_me %}
+        <div class="coach-about">{{ coach.about_me }}</div>
+      {% endif %}
+    </div>
+  {% endfor %}
+  {% if not summary %}
+    <p class="muted center">No coaches yet.</p>
+  {% endif %}
+  </div>
+{% endblock %}

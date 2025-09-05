@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>{% block title %}HJSS{% endblock %}</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container flex between center">
+        <nav class="nav-left">
+          <a class="brand" href="/">HJSS</a>
+          <a href="/coaches">Coaches</a>
+          <a href="/calendar">Calendar</a>
+          <a href="/my-classes">My Classes</a>
+          {% if current_role == 'coach' %}
+            <a href="/coach/learners">Find Learners</a>
+          {% endif %}
+          {# Keep left nav focused; sign-up moved to top-right #}
+        </nav>
+        <div class="nav-right">
+          {% if current_user %}
+            <span class="user-badge">Logged in as: {{ current_user.first_name }} {{ current_user.last_name }}</span>
+            <a class="btn" href="/account">Account</a>
+            <a class="btn btn-danger" href="/logout">Logout</a>
+          {% else %}
+            <a class="btn" href="/login">Login</a>
+            <a class="btn btn-primary" href="/register/learner">Sign up</a>
+          {% endif %}
+        </div>
+      </div>
+    </header>
+    <main class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+  </html>

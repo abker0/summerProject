@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}My Account{% endblock %}
+{% block content %}
+  <div class="account">
+  <h1>My Account</h1>
+
+  <section class="card" style="margin-bottom:1rem;">
+    <h2 style="margin-top:0; text-align:center;">Profile</h2>
+    <dl class="kv" style="justify-items:center;">
+      <dt>Role</dt>
+      <dd>{{ role }}</dd>
+      <dt>Name</dt>
+      <dd>
+        {% if role == 'coach' %}
+          {{ (user.title ~ ' ') if user.title else '' }}{{ user.first_name }} {{ user.last_name }}
+        {% else %}
+          {{ user.first_name }} {{ user.last_name }}
+        {% endif %}
+      </dd>
+      <dt>Email</dt>
+      <dd>{{ user.email }}</dd>
+      {% if role == 'learner' %}
+        <dt>Current Grade</dt>
+        <dd>{{ user.current_grade }}</dd>
+      {% endif %}
+    </dl>
+    {% if role == 'coach' %}
+      <div class="center" style="margin-top:.5rem;">
+        <a class="btn" href="{{ url_for('portal.coach_profile') }}">Edit coach profile</a>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="card" style="margin-bottom:1rem;">
+    <h2 style="margin-top:0; text-align:center;">Two-Factor Authentication</h2>
+    {% if user.two_factor_enabled %}
+      <p class="muted" style="text-align:center;">2FA is enabled on this account.</p>
+      <form method="post" action="{{ url_for('auth.account_disable_2fa') }}">
+        <button class="btn btn-primary" type="submit" style="display:block;margin:.5rem auto 0;">Disable 2FA</button>
+      </form>
+    {% else %}
+      <p class="muted" style="text-align:center;">Add an extra layer of security to your sign in.</p>
+      <form method="post" action="{{ url_for('auth.account_enable_2fa') }}">
+        <button class="btn btn-primary" type="submit" style="display:block;margin:.5rem auto 0;">Enable 2FA</button>
+      </form>
+    {% endif %}
+  </section>
+
+  <section class="card" style="margin-bottom:1rem;">
+    <h2 style="margin-top:0;">Change Password</h2>
+    <form method="post" action="{{ url_for('auth.change_password') }}">
+      <label>Old password <input type="password" name="old_password" required></label>
+      <label>New password <input type="password" name="new_password" required></label>
+      <label>Confirm new password <input type="password" name="confirm_password" required></label>
+      <button class="btn btn-primary" type="submit">Update Password</button>
+    </form>
+  </section>
+
+  <div class="center" style="margin-top:.75rem;">
+    <a class="btn" href="{{ url_for('auth.logout') }}">Log out</a>
+  </div>
+</div>
+{% endblock %}

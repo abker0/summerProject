@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Learner Profile{% endblock %}
+{% block content %}
+<div class="learner">
+<h1>{{ learner.first_name }} {{ learner.last_name }}</h1>
+
+<section class="card" style="margin-bottom:1rem;">
+  <h2 style="margin-top:0;">Details</h2>
+  <dl class="kv">
+    <dt>Email</dt><dd>{{ learner.email }}</dd>
+    <dt>Gender</dt><dd>{{ learner.gender }}</dd>
+    <dt>Age</dt><dd>{{ learner.age }}</dd>
+    <dt>Emergency contact</dt><dd>{{ learner.emergency_contact }}</dd>
+    <dt>Current grade</dt>
+    <dd>
+      <form class="flex" style="justify-content:center; gap:.5rem;" method="post" action="{{ url_for('portal.update_learner_grade', learner_id=learner.id) }}">
+        <input class="grade-input" type="number" name="current_grade" min="0" max="5" value="{{ learner.current_grade }}" {% if role != 'coach' %}disabled{% endif %} />
+        {% if role == 'coach' %}<button class="btn" type="submit">Update</button>{% endif %}
+      </form>
+    </dd>
+  </dl>
+</section>
+
+<section class="card" style="margin-bottom:1rem;">
+  <h2 style="margin-top:0;">Attendance summary</h2>
+  <div class="flex center" style="gap:1rem; justify-content:center;">
+    <span class="badge">Attended: {{ attended_count }}</span>
+    <span class="badge">Missed: {{ missed_count }}</span>
+    <span class="badge">Cancelled: {{ cancelled_count }}</span>
+  </div>
+  </section>
+
+<section class="card" style="margin-bottom:1rem;">
+  <h2 style="margin-top:0;">Upcoming lessons</h2>
+  <table>
+    <thead><tr><th>Date</th><th>Time</th><th>Grade</th><th>Coach</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for b in upcoming %}
+      <tr>
+        <td>{{ b.lesson.lesson_date }}</td>
+        <td>{{ b.lesson.time_slot }}</td>
+        <td>{{ b.lesson.grade_level }}</td>
+        <td>{{ b.lesson.coach.first_name }} {{ b.lesson.coach.last_name }}</td>
+        <td>{{ b.booking_status }}</td>
+      </tr>
+    {% endfor %}
+    {% if not upcoming %}
+      <tr><td colspan="5">No upcoming lessons.</td></tr>
+    {% endif %}
+    </tbody>
+  </table>
+</section>
+
+<section class="card">
+  <h2 style="margin-top:0;">Past lessons</h2>
+  <table>
+    <thead><tr><th>Date</th><th>Time</th><th>Grade</th><th>Coach</th><th>Status</th><th>Review</th></tr></thead>
+    <tbody>
+    {% for b in past %}
+      <tr>
+        <td>{{ b.lesson.lesson_date }}</td>
+        <td>{{ b.lesson.time_slot }}</td>
+        <td>{{ b.lesson.grade_level }}</td>
+        <td>{{ b.lesson.coach.first_name }} {{ b.lesson.coach.last_name }}</td>
+        <td>
+          {% if b.booking_status == 'attended' or b.attended %}Attended{% elif b.booking_status == 'cancelled' %}Cancelled{% elif b.booking_status == 'missed' %}Missed{% else %}Booked{% endif %}
+        </td>
+        <td>
+          {% if b.review %}
+            {{ b.review.rating }}/5 — {{ b.review.comment or 'No comment' }}
+          {% else %}
+            —
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    {% if not past %}
+      <tr><td colspan="6">No past lessons.</td></tr>
+    {% endif %}
+    </tbody>
+  </table>
+</section>
+</div>
+{% endblock %}
