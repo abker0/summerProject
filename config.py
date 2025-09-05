@@ -13,15 +13,13 @@ CORS(app)
 # Flask configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
-# Set up base directory for fallback SQLite database
-basedir = os.path.abspath(os.path.dirname(__file__))
-# Determine database URI from environment or fallback to a local SQLite file
-db_url = os.environ.get('DATABASE_URL')
-if not db_url:
-    db_file = os.path.join(basedir, 'app.db')
-    db_url = 'sqlite:///{}'.format(db_file.replace(os.sep, '/'))
-app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+# SQLAlchemy configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# File uploads
+app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
